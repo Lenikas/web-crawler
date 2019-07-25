@@ -20,24 +20,20 @@ def save_page(url):
 def get_links(html):
     soup = BeautifulSoup(html)
     links = soup.findAll('a', attrs={'href': re.compile("^http://")})
-    # links = soup.findAll('a') находит еще и href
-    only_http = re.findall(r'https?://\S+', str(links[0]))
+    #   links.append(soup.findAll('a'))
+    only_http = re.findall(r'https?://\S+', str(links))
     print(only_http)
     return only_http
 
-def recursive_url(url, depth):
-    if depth == 5:
-        return url
-    else:
-        page=urllib.request.urlopen(url)
-        soup=BeautifulSoup(page.read())
-        newlink=soup.find('a')
-        if len(newlink) == 0:
-            return url
-        else:
-            return url, recursive_url(newlink, depth+1)
+
+def recursive_url(url):
+    del url[0]
+    print(url[0])
+    a = save_page(url[0])
+    get_links(a)
 
 
 if __name__ == "__main__":
-    page=save_page(sys.argv[1])
-    get_links(page)
+    page = save_page(sys.argv[1])
+    a = get_links(page)
+    recursive_url(a)
