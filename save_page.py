@@ -1,39 +1,33 @@
-import urllib.request
-import sys
 from bs4 import BeautifulSoup
-from urllib.request import Request, urlopen
-import re
+import requests
+import lxml
+from lxml import html
+import sys
 
 
-def save_page(url):
+def find_links(url):
     """
-    Скачивает html страницы и записывает в файл с именем (после http://)
+    Находит все ссылки на указанной странице и возвращает список из этих ссылок
     """
-    req = Request(
-        url, headers={'User-Agent': 'Mozilla/5.0'})  # чтобы обойти блокировку
-    html = urlopen(req).read()
-    with open('{0}'.format(re.split(r'/', url)[2] + '.html'), "w") as file:
-        file.write(str(html))
-    return html
+    #   main_url = "https://lecturesnet.readthedocs.io/net/web.scraping/lxml.html"
+    re = requests.get(url)
+    root = lxml.html.fromstring(re.content)
+    page_links = [url + link for link in root.xpath('//a/@href')]
+    print(page_links)
+    return page_links
 
 
-def get_links(html):
-    soup = BeautifulSoup(html)
-    links = soup.findAll('a', attrs={'href': re.compile("^http://")})
-    #   links.append(soup.findAll('a'))
-    only_http = re.findall(r'https?://\S+', str(links))
-    print(only_http)
-    return only_http
+def recursive_find_url(list_links):
+    for link in list_links:
+        find_links(link)
 
 
-def recursive_url(url):
-    del url[0]
-    print(url[0])
-    a = save_page(url[0])
-    get_links(a)
+def main():
+    url = sys.argv[1]
+    list_links = find_links(url)
+    recursive_find_url(list_links)
 
 
-if __name__ == "__main__":
-    page = save_page(sys.argv[1])
-    a = get_links(page)
-    recursive_url(a)
+if __name__ == '__main__':
+    main()
+
