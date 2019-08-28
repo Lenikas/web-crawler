@@ -7,6 +7,7 @@ import re
 from urllib.request import urlopen
 
 
+
 def get_name(url):
     """Извлекает имя для файла из url"""
     # page = requests.get(url)
@@ -44,7 +45,7 @@ def get_links(soup):
     return list_links
 
 
-def recursive_find_url(list_links, max_depth=2):
+def recursive_find_url(list_links, max_depth=0):
     """Рекурсивный поиск ссылок"""
     if max_depth > 0:
         for link in list_links:
@@ -55,14 +56,5 @@ def recursive_find_url(list_links, max_depth=2):
             recursive_find_url(links, max_depth=max_depth-1)
 
 
-def main():
-    url = sys.argv[1]
-    save_page(url)
-    #max_depth = sys.argv[2]
-    soup = get_soup(url)
-    list_links = get_links(soup)
-    recursive_find_url(list_links)
-    
+
    
-if __name__ == '__main__':
-    main()
