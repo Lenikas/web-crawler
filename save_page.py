@@ -7,34 +7,34 @@ import re
 from urllib.request import urlopen
 
 
-
-def get_name(url):
-    """Извлекает имя для файла из url"""
-    # page = requests.get(url)
-    # tree = html.fromstring(page.content)
-    # names = [name.text_content().strip() for name in tree.cssselect('title')]
-    string_list = url.split('/')
-    return string_list[2]
-    # return names
-
-
-def save_page(url):
-    """Извлекает html и записывает в файл,сохраняемый в папке"""
-    #html = urlopen(url).read()
-    page = requests.get(url)
-    data = page.text
-    soup = BeautifulSoup(data).encode('utf-8')
-    name_page = "{0}.html".format(get_name(url))
-    with open(name_page, "wb") as page:
-        page.write(soup)
+class WorkWithURL(str):
+    def get_name(self):
+        """Извлекает имя для файла из url"""
+        # page = requests.get(url)
+        # tree = html.fromstring(page.content)
+        # names = [name.text_content().strip() for name in tree.cssselect('title')]
+        string_list = self.split('/')
+        return string_list[2]
+        # return names
 
 
-def get_soup(url):
-    """Получаем soup через url"""
-    page = requests.get(url)    
-    data = page.text
-    soup = BeautifulSoup(data)
-    return soup
+    def save_page(self):
+        """Извлекает html и записывает в файл,сохраняемый в папке"""
+        #html = urlopen(url).read()
+        page = requests.get(self)
+        data = page.text
+        soup = BeautifulSoup(data).encode('utf-8')
+        name_page = "{0}.html".format(WorkWithURL.get_name(self))
+        with open(name_page, "wb") as page:
+            page.write(soup)
+
+
+    def get_soup(self):
+        """Получаем soup через url"""
+        page = requests.get(self)    
+        data = page.text
+        soup = BeautifulSoup(data)
+        return soup
 
 
 def get_links(soup):
@@ -49,9 +49,10 @@ def recursive_find_url(list_links, max_depth=0):
     """Рекурсивный поиск ссылок"""
     if max_depth > 0:
         for link in list_links:
-            save_page(link)
+            link = WorkWithURL(link)
+            link.save_page()
             print(link)
-            soup = get_soup(link)
+            soup = link.get_soup()
             links = get_links(soup)
             recursive_find_url(links, max_depth=max_depth-1)
 
