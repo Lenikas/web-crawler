@@ -1,11 +1,12 @@
 from work_with_url import WorkWithURL
 from work_with_links import WorkWithLinks
 import argparse
+import sys
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Crawler")
-    parser.add_argument('--startcrawler')
+    parser.add_argument('--startcrawler',nargs=2)
     return parser.parse_args()
 
 
@@ -28,6 +29,7 @@ def main():
         process_arguments(args.startcrawler)
     else:
         print("error")
+
 
 
 if __name__ == "__main__":

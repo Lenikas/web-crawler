@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+from urllib import robotparser
 
 
 class WorkWithURL(str):
@@ -23,6 +24,15 @@ class WorkWithURL(str):
         data = page.text
         soup = BeautifulSoup(data)
         return soup
+
+    def process_robot_txt(self):
+        """Обрабатываем файл robots.txt и возвращаем true или false в зависимости от того,можно ли нам краулить сайт"""
+        rp = robotparser.RobotFileParser()
+        rp.set_url(self)
+        rp.read()
+        return rp.can_fetch('*', self)
+
+
 
 
 
