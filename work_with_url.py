@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
-from urllib import robotparser
+from urllib import robotparser, parse
 
 
 class WorkWithURL(str):
@@ -28,10 +28,26 @@ class WorkWithURL(str):
     def process_robot_txt(self):
         """Обрабатываем файл robots.txt и возвращаем true или false в зависимости от того,можно ли нам краулить сайт"""
         rp = robotparser.RobotFileParser()
-        rp.set_url(self)
+        rp.set_url(parse.urljoin(self, 'robots.txt'))
         rp.read()
         return rp.can_fetch('*', self)
 
+    def status_code_robots(self):
+        """Возвращает статус страницы robots.txt для данного урла"""
+        r = requests.get(self + "/robots.txt")
+        print(r.status_code)
+        return r.status_code
+
+    def status_code(self):
+        """Возвращает статус страницы данного урла"""
+        r = requests.get(self)
+        print(r.status_code)
+        return r.status_code
+
+    def create_link(self):
+        if self[0:4] != "http":
+            return "https://" + self
+        return self
 
 
 

@@ -11,8 +11,12 @@ class WorkWithLinks:
         """Находим все ссылки в soup-e и собираем в список """
         list_links = []
         for link in soup.find_all(attrs={'href': re.compile("http")}):
-            if WorkWithURL.process_robot_txt(link.get('href')):
-                list_links.append(link.get('href'))
+            link = link.get('href')
+            if (WorkWithURL.status_code(link) < 400 & WorkWithURL.status_code_robots(link) < 400) | (link[0:4] != "http"):
+                if WorkWithURL.process_robot_txt(link):
+                    list_links.append(link)
+            else:
+                list_links.append(link)
         return list_links
 
     @staticmethod
@@ -22,6 +26,7 @@ class WorkWithLinks:
             for link in list_links:
                 print(link)
                 link = WorkWithURL(link)
+                link = link.create_link()
                 link.save_page()
                 soup = link.get_soup()
                 links = WorkWithLinks.get_links(soup)
