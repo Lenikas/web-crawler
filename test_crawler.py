@@ -10,6 +10,18 @@ class TestWorkWithURL(unittest.TestCase):
         actual_name = WorkWithURL.get_name(WorkWithURL(url))
         self.assertEqual(expected_name, actual_name)
 
+    def test_status_code(self):
+        url = "https://www.google.ru"
+        expected_code = 200
+        actual_code = WorkWithURL.status_code(WorkWithURL(url))
+        self.assertEqual(expected_code, actual_code)
+
+    def test_status_code_robots(self):
+        url = "https://www.google.ru"
+        expected_code = 200
+        actual_code = WorkWithURL.status_code_robots(WorkWithURL(url))
+        self.assertEqual(expected_code, actual_code)
+
     def test_get_soup(self):
         self.assertEqual(1, 1)
 
