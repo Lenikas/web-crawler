@@ -7,7 +7,7 @@ class TestWorkWithURL(unittest.TestCase):
     def test_get_name(self):
         url = "https://www.google.ru"
         expected_name = "www.google.ru"
-        actual_name = WorkWithURL.get_name(url)
+        actual_name = WorkWithURL.get_name(WorkWithURL(url))
         self.assertEqual(expected_name, actual_name)
 
     def test_get_soup(self):

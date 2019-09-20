@@ -10,9 +10,12 @@ class WorkWithLinks:
     def get_links(soup):
         """Находим все ссылки в soup-e и собираем в список """
         list_links = []
-        for link in soup.find_all(attrs={'href': re.compile("http")}):
+        links = soup.find_all(attrs={'href': re.compile(r'(https?://[^\s]+)')})
+        for link in links:
             if WorkWithURL.process_robot_txt(link.get('href')):
                 list_links.append(link.get('href'))
+            else:
+                print("not allow")
         return list_links
 
     @staticmethod
