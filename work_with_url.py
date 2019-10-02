@@ -6,22 +6,32 @@ import os
 
 
 class WorkWithURL(str):
+    def __init__(self, url):
+        super().__init__()
+        self.url = url
+
     def get_name(self):
         """Извлекает имя для файла из url"""
-        string_list = self.split('/')
+        string_for_name = self.replace("?", ".")
+        string_list = string_for_name.split('/')
+        if len(string_list) > 4:
+            return string_list[2] + string_list[4]
         return string_list[2]
 
     def save_page(self):
-        """Извлекает html и записывает в файл,сохраняемый в папке"""
+        """Извлекает html и записывает в файл,сохраняемый в папке, если файл уже есть, то не скачивает повторно"""
         try:
             page = requests.get(self)
-        except URLError:
-            print("error")
-            return
+        except requests.exceptions.ConnectionError:
+            print("Connection error")
+            return ConnectionError
         data = page.text
         soup = BeautifulSoup(data).encode('utf-8')
         name_page = "{0}.html".format(WorkWithURL.get_name(self))
         directory = os.getcwd() + r"\pages"
+        if os.path.isfile(directory + "/" + name_page):
+            print("This file is already exist")
+            return
         with open(os.path.join(directory, name_page), "wb") as page:
             page.write(soup)
 
@@ -38,6 +48,6 @@ class WorkWithURL(str):
         try:
             rp.set_url(self + '/robots.txt')
             rp.read()
-        except (URLError, UnicodeDecodeError):
+        except (URLError, UnicodeEncodeError):
             return True
         return rp.can_fetch('*', self)

@@ -1,5 +1,8 @@
 import unittest
 from work_with_url import WorkWithURL
+import requests
+import bs4
+import os.path
 
 
 class TestWorkWithURL(unittest.TestCase):
@@ -10,23 +13,34 @@ class TestWorkWithURL(unittest.TestCase):
         actual_name = WorkWithURL.get_name(WorkWithURL(url))
         self.assertEqual(expected_name, actual_name)
 
-    def test_status_code(self):
-        url = "https://www.google.ru"
-        expected_code = 200
-        actual_code = WorkWithURL.status_code(WorkWithURL(url))
-        self.assertEqual(expected_code, actual_code)
-
-    def test_status_code_robots(self):
-        url = "https://www.google.ru"
-        expected_code = 200
-        actual_code = WorkWithURL.status_code_robots(WorkWithURL(url))
-        self.assertEqual(expected_code, actual_code)
-
     def test_get_soup(self):
-        self.assertEqual(1, 1)
+        url = WorkWithURL("https://lenta.ru")
+        actual = url.get_soup()
+        page = requests.get("https://lenta.ru")
+        data = page.text
+        expected = bs4.BeautifulSoup(data)
+        self.assertEqual(actual, expected)
+
+    def test_save_page_error(self):
+        url = WorkWithURL("https://lentabc.ru")
+        actual = url.save_page()
+        self.assertEqual(actual, ConnectionError)
 
     def test_save_page(self):
-        self.assertEqual(1, 1)
+        url = WorkWithURL("https://lenta.ru")
+        url.save_page()
+        actual = os.path.isfile(r"pages\lenta.ru.html")
+        self.assertEqual(actual, True)
+
+    def test_robots_true(self):
+        url = WorkWithURL("https://lenta.ru")
+        actual = url.process_robot_txt()
+        self.assertEqual(actual, True)
+
+    def test_robot_false(self):
+        url = WorkWithURL("https://github.com")
+        actual = url.process_robot_txt()
+        self.assertEqual(actual, False)
 
 
 class TestWorkWithLinks(unittest.TestCase):

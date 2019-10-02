@@ -4,12 +4,14 @@ import argparse
 
 
 def parse_args():
+    """Парсим аргументы для аргпарса"""
     parser = argparse.ArgumentParser(description="Crawler")
     parser.add_argument('--startcrawler', nargs=2)
     return parser.parse_args()
 
 
 def process_arguments(args):
+    """Разбор аргументов командной строки"""
     start_link = args[0]
     depth_search = 0
     if len(args) == 2:
@@ -21,6 +23,7 @@ def process_arguments(args):
 
 
 def start_crawler(data_for_start):
+    """Запуск краулера"""
     depth_search = data_for_start[1]
     start_link = data_for_start[0]
     WorkWithURL.save_page(start_link)
