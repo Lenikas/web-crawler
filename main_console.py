@@ -1,44 +1,37 @@
-from work_with_url import WorkWithURL
-from work_with_links import WorkWithLinks
+from threading import Thread
+
+from work_with_url import URLWorker
+from work_with_links import LinksWorker
 import argparse
 
 
 def parse_args():
     """Парсим аргументы для аргпарса"""
     parser = argparse.ArgumentParser(description="Crawler")
-    parser.add_argument('--startcrawler', nargs=2)
+    parser.add_argument('--startcrawler', nargs=2,
+                        help=r"python main_console --startcrawler {link for start} {depth for search}")
     return parser.parse_args()
 
 
-def process_arguments(args):
-    """Разбор аргументов командной строки"""
-    start_link = args[0]
-    depth_search = 0
-    if len(args) == 2:
-        depth_search = int(args[1])
-    else:
-        print("get depth for search")
-        exit(0)
-    return start_link, depth_search
-
-
-def start_crawler(data_for_start):
+def start_crawler(start_link, depth):
     """Запуск краулера"""
-    depth_search = data_for_start[1]
-    start_link = data_for_start[0]
-    WorkWithURL.save_page(start_link)
-    soup = WorkWithURL.get_soup(start_link)
-    list_links = WorkWithLinks.get_links(soup)
-    WorkWithLinks.recursive_find_url(list_links, depth_search)
+    URLWorker.save_page(start_link)
+    LinksWorker.global_list.append(start_link)
+    #soup = URLWorker.get_soup(start_link)
+    thread = Thread(LinksWorker.recursive_find_url(start_link, depth))
+    thread.start()
+    print(LinksWorker.global_list[0])
+    LinksWorker.new_thread_download(LinksWorker.global_list[0])
 
 
 def main():
     args = parse_args()
     if args.startcrawler:
-        data_for_start = process_arguments(args.startcrawler)
-        start_crawler(data_for_start)
+        start_link = args.startcrawler[0]
+        depth = int(args.startcrawler[1])
+        start_crawler(start_link, depth)
     else:
-        print("error")
+        raise SyntaxError("usage: main_console.py [-h] [--startcrawler STARTCRAWLER STARTCRAWLER]")
 
 
 if __name__ == "__main__":

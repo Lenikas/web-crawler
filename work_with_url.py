@@ -5,7 +5,7 @@ from urllib import robotparser
 import os
 
 
-class WorkWithURL(str):
+class URLWorker(str):
     def __init__(self, url):
         super().__init__()
         self.url = url
@@ -27,9 +27,9 @@ class WorkWithURL(str):
             return ConnectionError
         data = page.text
         soup = BeautifulSoup(data).encode('utf-8')
-        name_page = "{0}.html".format(WorkWithURL.get_name(self))
+        name_page = "{0}.html".format(URLWorker.get_name(self))
         directory = os.getcwd() + r"\pages"
-        if os.path.isfile(directory + "/" + name_page):
+        if os.path.isfile(os.path.join(directory, name_page)):
             print("This file is already exist")
             return
         with open(os.path.join(directory, name_page), "wb") as page:
