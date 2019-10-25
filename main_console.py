@@ -1,5 +1,4 @@
 from threading import Thread
-
 from work_with_url import URLWorker
 from work_with_links import LinksWorker
 import argparse
@@ -16,12 +15,14 @@ def parse_args():
 def start_crawler(start_link, depth):
     """Запуск краулера"""
     URLWorker.save_page(start_link)
-    LinksWorker.global_list.append(start_link)
-    #soup = URLWorker.get_soup(start_link)
-    thread = Thread(LinksWorker.recursive_find_url(start_link, depth))
-    thread.start()
-    print(LinksWorker.global_list[0])
-    LinksWorker.new_thread_download(LinksWorker.global_list[0])
+    soup = URLWorker.get_soup(start_link)
+    links = LinksWorker.get_links(soup)
+    thread1 = Thread(target=LinksWorker.recursive_find_url(links, depth))
+    thread2 = Thread(target=URLWorker.save_division(thread1, LinksWorker.all_links_save))
+    thread1.start()
+    thread2.start()
+    thread1.join()
+    thread2.join()
 
 
 def main():

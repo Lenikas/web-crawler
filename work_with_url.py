@@ -1,8 +1,10 @@
+import threading
 from urllib.error import URLError
 from bs4 import BeautifulSoup
 import requests
 from urllib import robotparser
 import os
+import re
 
 
 class URLWorker(str):
@@ -12,14 +14,12 @@ class URLWorker(str):
 
     def get_name(self):
         """Извлекает имя для файла из url"""
-        string_for_name = self.replace("?", ".")
-        string_list = string_for_name.split('/')
-        if len(string_list) > 4:
-            return string_list[2] + string_list[4]
-        return string_list[2]
+        string_for_name = self.replace("https://", "")
+        return re.sub('[^a-zA-Z0-9]', '', string_for_name)
 
     def save_page(self):
         """Извлекает html и записывает в файл,сохраняемый в папке, если файл уже есть, то не скачивает повторно"""
+
         try:
             page = requests.get(self)
         except requests.exceptions.ConnectionError:
@@ -30,10 +30,21 @@ class URLWorker(str):
         name_page = "{0}.html".format(URLWorker.get_name(self))
         directory = os.getcwd() + r"\pages"
         if os.path.isfile(os.path.join(directory, name_page)):
-            print("This file is already exist")
             return
         with open(os.path.join(directory, name_page), "wb") as page:
             page.write(soup)
+        print("download" + " " + self)
+
+    @staticmethod
+    def save_division(thread, all_links_save):
+        print(all_links_save)
+        while thread.is_alive() or len(all_links_save) > 0:
+            for link in all_links_save:
+                all_links_save.remove(link)
+                th = threading.Thread(target=URLWorker.save_page(link))
+                th.start()
+        while len(all_links_save) > 0:
+            pass
 
     def get_soup(self):
         """Получаем soup через url"""
@@ -48,6 +59,6 @@ class URLWorker(str):
         try:
             rp.set_url(self + '/robots.txt')
             rp.read()
-        except (URLError, UnicodeEncodeError):
+        except (URLError, UnicodeEncodeError, UnicodeDecodeError):
             return True
         return rp.can_fetch('*', self)
