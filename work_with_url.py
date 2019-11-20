@@ -1,3 +1,4 @@
+import sys
 import threading
 from urllib.error import URLError
 from bs4 import BeautifulSoup
@@ -5,6 +6,7 @@ import requests
 from urllib import robotparser
 import os
 import re
+from queue import Empty
 
 
 class URLWorker(str):
@@ -17,9 +19,8 @@ class URLWorker(str):
         string_for_name = self.replace("https://", "")
         return re.sub('[^a-zA-Z0-9]', '', string_for_name)
 
-    def save_page(self):
+    def save_page(self, folder):
         """Извлекает html и записывает в файл,сохраняемый в папке, если файл уже есть, то не скачивает повторно"""
-
         try:
             page = requests.get(self)
         except requests.exceptions.ConnectionError:
@@ -28,7 +29,7 @@ class URLWorker(str):
         data = page.text
         soup = BeautifulSoup(data).encode('utf-8')
         name_page = "{0}.html".format(URLWorker.get_name(self))
-        directory = os.getcwd() + r"\pages"
+        directory = os.path.join(os.getcwd(), folder)
         if os.path.isfile(os.path.join(directory, name_page)):
             return
         with open(os.path.join(directory, name_page), "wb") as page:
@@ -36,15 +37,18 @@ class URLWorker(str):
         print("download" + " " + self)
 
     @staticmethod
-    def save_division(thread, all_links_save):
-        print(all_links_save)
-        while thread.is_alive() or len(all_links_save) > 0:
-            for link in all_links_save:
-                all_links_save.remove(link)
-                th = threading.Thread(target=URLWorker.save_page(link))
-                th.start()
-        while len(all_links_save) > 0:
-            pass
+    def save_division(thread, all_links, directory, i):
+        """Пока работает главный тред по поиску ссылок или очередь еще не пуста, продолжаеи загрузку"""
+        while thread.isAlive() or all_links.qsize() > 0:
+            try:
+                print("works thread {0}".format(i))
+                link = all_links.get()
+                #оследнре потоки здесь крашатся потому что ссылок больше нет а ошибка не пробрасывается
+                print(all_links.qsize())
+                URLWorker.save_page(link, directory)
+            except Exception:
+                return
+
 
     def get_soup(self):
         """Получаем soup через url"""

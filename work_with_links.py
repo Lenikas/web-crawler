@@ -1,10 +1,13 @@
+import sys
+
 import work_with_url
 import re
+from queue import Queue
+#from multiprocessing import Queue
 
 
 class LinksWorker:
-    all_links = []
-    all_links_save = []
+    all_links = Queue()
 
     @staticmethod
     def get_links(soup):
@@ -12,10 +15,11 @@ class LinksWorker:
         list_links = []
         links = soup.find_all(attrs={'href': re.compile(r'(https?://[^\s]+)')})
         for link in links:
-            if work_with_url.URLWorker.process_robot_txt(link.get('href')):
-                list_links.append(link.get('href'))
-                LinksWorker.all_links.append(link.get('href'))
-                LinksWorker.all_links_save.append(link.get('href'))
+            url = link.get('href')
+            if work_with_url.URLWorker.process_robot_txt(url):
+                list_links.append(url)
+                LinksWorker.all_links.put(url)
+                print(LinksWorker.all_links.qsize())
             else:
                 print("not allow")
         return list_links
@@ -30,6 +34,7 @@ class LinksWorker:
                 soup = link.get_soup()
                 new_links = LinksWorker.get_links(soup)
                 LinksWorker.recursive_find_url(new_links, max_depth=-1)
+
 
 
 
