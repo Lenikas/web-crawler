@@ -1,4 +1,3 @@
-import sys
 from threading import Thread
 from work_with_url import URLWorker
 from work_with_links import LinksWorker
@@ -19,21 +18,16 @@ def start_crawler(start_link, depth):
     URLWorker.save_page(start_link, "pages")
     soup = URLWorker.get_soup(start_link)
     links = LinksWorker.get_links(soup)
-    thread1 = Thread(target=LinksWorker.recursive_find_url, args=(links, depth))
-    thread1.start()
+    main_thread = Thread(target=LinksWorker.recursive_find_url, args=(links, depth))
+    main_thread.start()
     list_thread = []
-    for i in range(4):
+    for i in range(3):
         thread_download = Thread(name=str(i), target=URLWorker.save_division,
-                                 args=(thread1, LinksWorker.all_links, "pages", i))
+                                 args=(main_thread, LinksWorker.all_links, "pages"))
         list_thread.append(thread_download)
-        print(list_thread)
         thread_download.start()
-    thread1.join()
+    main_thread.join()
     for thread in list_thread:
-        print(list_thread)
-        print(LinksWorker.all_links.qsize())
-        print("aaaaaaaaaa")
-
         thread.join()
 
 

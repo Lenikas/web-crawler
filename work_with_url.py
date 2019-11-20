@@ -1,12 +1,9 @@
-import sys
-import threading
 from urllib.error import URLError
 from bs4 import BeautifulSoup
 import requests
 from urllib import robotparser
 import os
 import re
-from queue import Empty
 
 
 class URLWorker(str):
@@ -28,7 +25,7 @@ class URLWorker(str):
             return ConnectionError
         data = page.text
         soup = BeautifulSoup(data).encode('utf-8')
-        name_page = "{0}.html".format(URLWorker.get_name(self))
+        name_page = "{0}.html".format(URLWorker.get_name(self))[:255]
         directory = os.path.join(os.getcwd(), folder)
         if os.path.isfile(os.path.join(directory, name_page)):
             return
@@ -37,18 +34,12 @@ class URLWorker(str):
         print("download" + " " + self)
 
     @staticmethod
-    def save_division(thread, all_links, directory, i):
+    def save_division(thread, all_links, directory):
         """Пока работает главный тред по поиску ссылок или очередь еще не пуста, продолжаеи загрузку"""
         while thread.isAlive() or all_links.qsize() > 0:
-            try:
-                print("works thread {0}".format(i))
-                link = all_links.get()
-                #оследнре потоки здесь крашатся потому что ссылок больше нет а ошибка не пробрасывается
-                print(all_links.qsize())
-                URLWorker.save_page(link, directory)
-            except Exception:
-                return
-
+            link = all_links.get()
+            print(all_links.qsize())
+            URLWorker.save_page(link, directory)
 
     def get_soup(self):
         """Получаем soup через url"""

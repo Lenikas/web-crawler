@@ -1,9 +1,6 @@
-import sys
-
 import work_with_url
 import re
 from queue import Queue
-#from multiprocessing import Queue
 
 
 class LinksWorker:
@@ -19,7 +16,6 @@ class LinksWorker:
             if work_with_url.URLWorker.process_robot_txt(url):
                 list_links.append(url)
                 LinksWorker.all_links.put(url)
-                print(LinksWorker.all_links.qsize())
             else:
                 print("not allow")
         return list_links
