@@ -9,19 +9,23 @@
 main_console - азбор аргументов командной строки и метод main()
 work_with_url - содержит соответсвующий класс с методами обработки url
 work_with_links - содержит соответсвующий класс с методами, выполняющими поиск и обработку найденных ссылок
+work_with_threads - содержит класс для обращения с потоками
+work_with_graph - содержит класс с методами для работы с ссылочным графом,его отрисовкой
 test_crawler - тесты для вышеприведенных классов
 
 Консольная версия 
 
 Примеры запуска консольной версии:
 
-- python main_console --startcrawler {link for start} {depth for search}
+- python main_console --startcrawler {link for start} {depth for search} {count of download threads}
 
+- python main_console --startcrawler {link for start} (по умолчанию количество потоков равно 1, а глубина поиска равна 0)
 
-
+В конце работы краулера в папке с проектом появится файл graph.html, открыв который можно увидеть ссылочный граф проделанной краулером работы.
+Так же появится файл logs.log, в котором будут логи процесса работы с ссылками и их загрузки.
 
 Библиотеки: 
-	BeautifulSoup, requests, re, argparse
+	BeautifulSoup, requests, re, argparse, bokeh, networkx, logging,
 Для тестов:
 	unittests
 

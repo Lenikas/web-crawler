@@ -4,12 +4,13 @@ import requests
 from urllib import robotparser
 import os
 import re
+import logging
 
 
 class URLWorker(str):
-    def __init__(self, url):
-        super().__init__()
-        self.url = url
+
+    logging.basicConfig(filename="logs.log", filemode="w", level=logging.INFO)
+    log = logging.getLogger("info")
 
     def get_name(self):
         """Извлекает имя для файла из url"""
@@ -21,7 +22,7 @@ class URLWorker(str):
         try:
             page = requests.get(self)
         except requests.exceptions.ConnectionError:
-            print("Connection error")
+            URLWorker.log.info("Connection error {0}".format(self))
             return ConnectionError
         data = page.text
         soup = BeautifulSoup(data).encode('utf-8')
@@ -29,17 +30,22 @@ class URLWorker(str):
         directory = os.path.join(os.getcwd(), folder)
         if os.path.isfile(os.path.join(directory, name_page)):
             return
-        with open(os.path.join(directory, name_page), "wb") as page:
-            page.write(soup)
-        print("download" + " " + self)
+        try:
+            with open(os.path.join(directory, name_page), "wb") as page:
+                page.write(soup)
+        except FileNotFoundError:
+            return
+        URLWorker.log.info("download {0}".format(self))
 
     @staticmethod
     def save_division(thread, all_links, directory):
-        """Пока работает главный тред по поиску ссылок или очередь еще не пуста, продолжаеи загрузку"""
+        """Пока работает главный тред по поиску ссылок или очередь еще не пуста, продолжаем загрузку"""
         while thread.isAlive() or all_links.qsize() > 0:
             link = all_links.get()
-            print(all_links.qsize())
+            if link is None:
+                break
             URLWorker.save_page(link, directory)
+            all_links.task_done()
 
     def get_soup(self):
         """Получаем soup через url"""

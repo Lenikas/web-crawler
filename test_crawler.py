@@ -1,11 +1,11 @@
-import unittest
 from work_with_url import URLWorker
 from work_with_links import LinksWorker
+from threading import Thread
+from queue import Queue
 import requests
 import bs4
 import os.path
-from threading import Thread
-from multiprocessing import Queue
+import unittest
 
 
 class TestWorkWithURL(unittest.TestCase):
