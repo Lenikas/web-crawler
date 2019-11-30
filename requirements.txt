@@ -1,5 +1,7 @@
 bokeh
 bs4
+os
+queue
 requests
 pytest
 pytest-cov

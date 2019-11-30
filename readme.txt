@@ -17,9 +17,12 @@ test_crawler - тесты дл€ вышеприведенных классов
 
 ѕримеры запуска консольной версии:
 
-- python main_console --startcrawler {link for start} {depth for search} {count of download threads}
+- python main_console --startcrawler {link for start} {depth for search} {count of download threads} {filters}
+- python main_console --startcrawler https://lenta.ru 0 1 only_http
 
-- python main_console --startcrawler {link for start} (по умолчанию количество потоков равно 1, а глубина поиска равна 0)
+- python main_console --startcrawler {link for start} (по умолчанию количество потоков равно 1, а глубина поиска равна 0, фильтер по https ссылкам)
+- python main_console --startcrawler https://lenta.ru
+
 
 ¬ конце работы краулера в папке с проектом по€витс€ файл graph.html, открыв который можно увидеть ссылочный граф проделанной краулером работы.
 “ак же по€витс€ файл logs.log, в котором будут логи процесса работы с ссылками и их загрузки.

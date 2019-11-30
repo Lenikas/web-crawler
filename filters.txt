@@ -1,0 +1,4 @@
+https?://[^\s]+
+http?://[^\s]+
+https?://[^\s]+|http?://[^\s]+
+https://vk.com/|https://www.facebook.com/

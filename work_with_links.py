@@ -11,10 +11,10 @@ class LinksWorker:
     log = logging.getLogger("info")
 
     @staticmethod
-    def get_links(soup):
+    def get_links(soup, selections):
         """Находим все ссылки в soup-e и собираем в список """
         list_links = []
-        links = soup.find_all(attrs={'href': re.compile(r'(https?://[^\s]+)')})
+        links = soup.find_all(attrs={'href': re.compile(r"{}".format(selections))})
         for link in links:
             url = link.get('href')
             if work_with_url.URLWorker.process_robot_txt(url):
@@ -25,16 +25,16 @@ class LinksWorker:
         return list_links
 
     @staticmethod
-    def recursive_find_url(list_links, max_depth):
+    def recursive_find_url(list_links, selections,  max_depth):
         """Рекурсивный поиск ссылок"""
         if max_depth > 0:
             for link in list_links:
                 LinksWorker.log.info("process {0}".format(link))
                 link = work_with_url.URLWorker(link)
                 soup = link.get_soup()
-                new_links = LinksWorker.get_links(soup)
+                new_links = LinksWorker.get_links(soup, selections)
                 LinksWorker.dict_for_graph[link] = new_links
-                LinksWorker.recursive_find_url(new_links, max_depth=max_depth - 1)
+                LinksWorker.recursive_find_url(new_links, selections, max_depth=max_depth - 1)
 
 
 
